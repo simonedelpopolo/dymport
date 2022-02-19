@@ -2,36 +2,37 @@ import * as Module from 'module'
 import { constants } from 'fs'
 import { request } from 'https'
 import { resolve } from 'path'
-import { access, readFile, writeFile } from 'fs/promises'
-import { array_, boolean_, function_, object_, string_, undefined_ } from 'oftypes'
+import { access, writeFile } from 'fs/promises'
+import { array_, function_, object_, promise_, string_, undefined_ } from 'oftypes'
 import { AssertionError, deepStrictEqual, ok } from 'assert'
 
 const dymport = Object.create( Module )
 export default dymport
+/** -
 
-/**
+/!**
  * The source implementation, definition.
  *
  * @type {{imports: string[], functions: [{export: string, function: (function(*): *)}]}}
- */
+ *!/
 const sourc = {
 
-    /**
+    /!**
      * The first entry (`source.imports`) of the module is set to an array of entries for every import required by the module.
-     */
+     *!/
     imports: [
         'import {readFile} from \'fs/promises\';',
     ],
 
-    /**
+    /!**
      * The second entry (`source.functions`) of the module is set to an array.
      * Each entry of the array is a function.
-     */
+     *!/
     functions:
 
-    /**
+    /!**
      * Enclose every function into an array.
-     */
+     *!/
         [
             {
 
@@ -52,12 +53,12 @@ const sourc = {
         ],
 }
 
-/**
+/!**
  * The signature implementation, definition.
  *
  * @type {{name:string, version:string, license: string, author: { name: string, email: string, gpg: string,},
  * git: string, website: string, script: string[]}}
- */
+ *!/
 const signs = {
 
     // The package name. For dnpm.io this is required
@@ -89,6 +90,7 @@ const signs = {
         'application/wasm',
     ],
 }
+*/
 
 
 // A todo refactoring for this class
@@ -204,22 +206,31 @@ const __methods = {
             return error.message
         }
 
+        console.log(functions)
         // Types check for the 'functions' property__________________________________________________________________________
         let counter = 0
-
+        
         for ( const index in functions ) {
-
+            
             for ( const expo in functions[ index ] ) {
+                
+                
+                console.log( expo  )
+                console.log(functions[ index ][ expo ])
+                
                 if ( counter + parseInt( expo ) % 2 === 0 ) {
                     try {
+                        
                         ok( await string_( functions[ index ][ expo ][ 0 ] ) === true, 'first entry of the function array must be oftype string' )
                     } catch ( error ) {
                         return error
                     }
                 } else {
                     try {
-                        ok( await function_( functions[ index ][ expo ][ 0 ] ) === true, 'second entry of the function array must be oftype function' )
+                        
+                        ok( await promise_( functions[ index ][ expo ][ 0 ] ) === true, 'second entry of the function array must be oftype function' )
                     } catch ( error ) {
+                        
                         return error
                     }
                 }
@@ -506,23 +517,6 @@ const __methods = {
     },
 
     queue: false,
-
-    fulfilled: function fulfilled( x, y, z ) {
-        return x === true ? [
-            y,
-            z,
-        ] : y
-    },
-
-    /*Events: {
-        emitter: ()=>{
-            return new EventEmitter()
-        },
-        active: false,
-        pushed: this.emitter().emit( 'pushed' ),
-        loaded: this.emitter().emit( 'loaded' ),
-        queued: [],
-    },*/
 }
 
 Object.defineProperty( dymport, 'module_', {
@@ -541,33 +535,21 @@ Object.defineProperty( dymport, 'module_', {
      */
     value: async function module_( source, signature, queue = false ) {
 
-        //__methods.source = source
-        //__methods.signature = signature
-
-        let types = await __methods.types( source, signature )
-        if ( types !== true )
-            return __methods.typeError( types ).catch( error => error )
-
-        let reference = await __methods.references( source, signature )
-        if ( reference !== true )
-            return __methods.typeError( reference ).catch( error => error )
-
-        return new Promise( ( resolve ) => {
+        return new Promise( async ( resolve ) => {
 
             let data = `data:${ signature.script }, `
 
-            for ( const line in source[ 0 ][ 0 ].imports )
-                data += `${ source[ 0 ][ 0 ].imports[ line ] }`
+            for ( const line in source.imports )
+                data += `${ source.imports[ line ] }`
 
 
-            for ( const index in source[ 1 ] ) {
+            for ( const index in source.functions ) {
 
-                for ( const func in source[ 1 ][ index ] )
-                    data += `\n${ source[ 1 ][ index ][ func ].toLocaleString() }`
-
-
+                for ( const func in source.functions[ index ] )
+                    data += `\n ${ source.functions[ index ][ func ].toLocaleString() }`
             }
-            resolve( import( data ) )
+            
+            resolve( await import( data ) )
         } )
     },
 } )
@@ -583,7 +565,7 @@ Object.defineProperty( dymport, 'package_', {
      * @returns {Promise<[{source:[string, any,{name:string,version:number,license:string,author:string,npmjs:string}], signature:{name: string, version: string, license: string, author: string, remote: false, local: true, script: ['application/json','text/javascript'], loaders: [ 'json', 'javascript' ],}}]>|TypeError}
      */
     value: async function package_( location ) {
-
+        
         const resolvers = {
             true: true,
             false: 'Only type of object is accepted for the argument \'location\'',
@@ -607,12 +589,8 @@ Object.defineProperty( dymport, 'package_', {
             default:
                 break
         }
-        const module = await import( data )
-
-        return [
-            module.source,
-            module.signature,
-        ]
+        
+        return import( data )
     },
 } )
 
@@ -678,6 +656,7 @@ Object.defineProperty( dymport, 'local_', {
     enumerable: true,
     writable: false,
     configurable: false,
+    
     /**
      * Loads the package from local.
      *
@@ -729,15 +708,3 @@ export function package_( location ) {
 
     return dymport.package_( location )
 }
-
-/**
- * Freeze the Object.
- *
- * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/freeze
- */
-Object.freeze( dymport )
-
-
-const { source, signature } = await dymport.remote_( undefined, 'call-me' )
-
-console.log( await module_( source, signature ) )

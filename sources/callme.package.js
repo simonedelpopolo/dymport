@@ -1,5 +1,3 @@
-import { readFile } from 'fs/promises'
-
 export const signature = {
     name: '',
     version: '',
@@ -32,17 +30,13 @@ export const source = {
         [
             {
                 
-                // First entry is for the type of the export (source.function[0].export)
+                // First entry is for the type of the export (source.functions[0].export)
                 export: 'export default',
                 
-                // Second entry of the function is an array of a self executing function (source.function[].function)
+                // Second entry of the function is an array of a self executing function (source.functions[1].function)
                 function: ( async function callMe( message ) {
                     
                     console.log( message )
-                    
-                    return readFile( './index.js' )
-                        .then( buffer => buffer )
-                        .catch( error => error )
                     
                 } ),
             },
