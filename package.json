@@ -1,6 +1,6 @@
 {
   "name": "dymport",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Dynamic module import. Javascript ESModule.",
   "type": "module",
   "main": "index.js",
@@ -9,13 +9,13 @@
     "eslint-fix": "npx eslint --fix . --ext .js"
   },
   "dependencies": {
-    "oftypes": "^0.4.4",
-    "boolean-jokes": "^1.4.7",
-    "json-swiss-knife": "^1.5.9"
+    "oftypes": "latest",
+    "boolean-jokes": "latest",
+    "json-swiss-knife": "latest"
   },
   "devDependencies": {
-    "eslint": "^8.9.0",
-    "eslint-plugin-jsdoc": "^37.9.1"
+    "eslint": "^8.11.0",
+    "eslint-plugin-jsdoc": "^38.0.5"
   },
   "publishConfig": {
     "access": "public"
