@@ -1,6 +1,6 @@
 {
   "name": "dymport",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Dynamic module import. Javascript ESModule.",
   "type": "module",
   "main": "index.js",
